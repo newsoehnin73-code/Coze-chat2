@@ -1,36 +1,188 @@
 
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics-compat.js"></script>
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#eaf5ff">
+<title>Coze Chat</title>
+<style>
+:root{--blue:#B9DCFA;--pale:#F3F9FF;--ink:#203247;--muted:#718397;--line:#e5edf4}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit}
+button{border:0;border-radius:14px;padding:13px 16px;background:#8fc8f4;color:#17334d;font-weight:700;cursor:pointer}
+.wrap{max-width:520px;margin:auto;min-height:100dvh;padding:22px 18px 95px}
+.brand{font-size:28px;font-weight:800;margin:12px 0 4px}
+.sub,.muted{color:var(--muted);font-size:13px}
+.card{background:white;border:1px solid var(--line);border-radius:22px;padding:20px;margin:14px 0;box-shadow:0 8px 24px #5c9ac010}
+h2{font-size:20px;margin:0 0 16px}
+label{display:block;font-size:13px;color:#60758a;margin:12px 0 6px}
+input,textarea,select{width:100%;border:1px solid #dce8f2;border-radius:13px;padding:13px;background:#fbfdff;color:var(--ink)}
+textarea{min-height:78px;resize:vertical}
+.full{width:100%;margin-top:14px}
+.ghost{background:#edf7ff;color:#315c7d}
+.hidden{display:none!important}
+.switch{text-align:center;color:#347cb5;margin-top:16px;cursor:pointer}
+.note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}
+.top{display:flex;align-items:center;justify-content:space-between}
+.avatar{width:42px;height:42px;border-radius:50%;background:#e0f2ff;display:grid;place-items:center;font-weight:800}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#ffffffed;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:10px 4px calc(10px + env(safe-area-inset-bottom));backdrop-filter:blur(12px)}
+.nav button{background:transparent;padding:8px 10px;font-size:12px;color:#60758a}
+.nav button.active{color:#267bb8;background:#edf7ff}
+#status{font-size:13px;color:#b14d4d;min-height:18px;margin-top:10px}
+.character{border:1px solid var(--line);padding:14px;border-radius:16px;margin:10px 0;background:#fff}
+.character h3{margin:0 0 6px}
+.tag{display:inline-block;background:#edf7ff;border-radius:20px;padding:5px 9px;font-size:11px;color:#42769d;margin-top:8px}
+.actions{display:flex;gap:8px;margin-top:12px}
+.actions button{flex:1;padding:10px;font-size:12px}
+.photoBox{display:flex;align-items:center;gap:14px;background:#f6fbff;border:1px dashed #b9dafa;padding:14px;border-radius:16px}
+.photoPreview{width:76px;height:76px;flex-shrink:0;border-radius:50%;background:#e5f4ff;display:grid;place-items:center;overflow:hidden}
+.photoPreview img{width:100%;height:100%;object-fit:cover}
+.largeText{min-height:190px;line-height:1.55}
+.counter{text-align:right;color:#7891a5;font-size:12px;margin-top:5px}
+.searchWrap{display:flex;gap:8px;margin:14px 0}
+.searchWrap input{flex:1;min-width:0}
+.searchWrap button{white-space:nowrap}
+.storyCover{width:100%;max-height:220px;object-fit:cover;border-radius:14px}
+.storyDetailText{white-space:pre-wrap;line-height:1.6}
+.roleplayMessages{min-height:220px;max-height:48vh;overflow:auto;background:#f5faff;border:1px solid var(--line);border-radius:16px;padding:12px;margin:14px 0}
+.roleplayBubble{max-width:88%;padding:10px 12px;border-radius:14px;margin:8px 0;white-space:pre-wrap;line-height:1.45;font-size:14px}
+.roleplayBubble.user{margin-left:auto;background:#dff1ff}
+.roleplayBubble.system{background:#fff;border:1px solid var(--line)}
+.roleplayComposer{display:flex;gap:8px;align-items:end}
+.roleplayComposer textarea{flex:1;min-width:0;min-height:48px}
+.plusMenu{display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:#f3f9ff;border:1px solid var(--line);border-radius:14px;margin-top:8px}
+.phoneShell{background:#f6fbff;border:1px solid #dcecf9;border-radius:22px;padding:14px;margin-top:12px}
+.phoneTabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0}
+.phoneTabs button{padding:9px 4px;font-size:11px;background:#fff;color:#52738d}
+.phoneEntry{background:#fff;border:1px solid #e4eef6;border-radius:13px;padding:11px;margin:8px 0;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<main class="wrap">
+<div class="brand">Coze Chat ✦</div>
+<div class="sub">Myanmar · English · 中文</div>
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyALhftVE8xqgemjXu4OPmiZEFHhkr5Bcec",
-  authDomain: "coze-chat2.firebaseapp.com",
-  projectId: "coze-chat2",
-  storageBucket: "coze-chat2.firebasestorage.app",
-  messagingSenderId: "34808835852",
-  appId: "1:34808835852:web:7539f77548d6475462a329",
-  measurementId: "G-ZTQ90WH8Q2"
-};
+<section id="auth">
+<div class="card">
+<h2 id="formTitle">Welcome back</h2>
+<div id="nameField" class="hidden">
+<label>Username</label>
+<input id="username" placeholder="Your username">
+</div>
+<label>Email</label>
+<input id="email" type="email" placeholder="name@example.com">
+<label>Password</label>
+<input id="password" type="password" placeholder="At least 6 characters">
+<button class="full" id="submitBtn">Log in</button>
+<div class="switch" id="switchMode">Create an account</div>
+<div id="status"></div>
+</div>
+</section>
 
-firebase.initializeApp(firebaseConfig);
+<section id="app" class="hidden">
+<div class="top">
+<div><div class="muted">Welcome to Coze Chat</div><h2 id="hello">Hello</h2></div>
+<div class="avatar" id="avatar">C</div>
+</div>
 
-const auth = firebase.auth();
-const db = firebase.firestore();
+<div class="card" id="homePanel">
+<h2>Start exploring</h2>
+<p class="muted">Discover characters and create your own.</p>
+<button class="full" onclick="showTab('discover')">Explore characters</button>
+<button class="full ghost" onclick="showTab('create')">Create a character</button>
+<button class="full ghost" onclick="newStory()">Create a story</button>
+<button class="full ghost" onclick="showTab('world')">Character World</button>
+</div>
 
-let analytics = null;
+<div class="card hidden" id="discoverPanel">
+<h2>Discover</h2>
+<div class="searchWrap">
+<input id="discoverSearch" placeholder="Search characters...">
+<button class="ghost" id="clearSearch">Clear</button>
+</div>
+<button class="ghost" onclick="loadCharacters()">Refresh</button>
+<h3>Characters</h3><div id="publicList"></div>
+<h3>Stories</h3><div id="publicStories"></div>
+</div>
 
-if (firebase.analytics.isSupported()) {
-  analytics = firebase.analytics();
-  analytics.logEvent("page_view", {
-    page_title: "Coze Chat",
-    page_location: window.location.href
-  });
-}
+<div class="card hidden" id="createPanel">
+<h2 id="createTitle">Create Character</h2>
+<div class="photoBox">
+<div class="photoPreview" id="charPhotoPreview">✦</div>
+<div><label>Character Avatar</label><input id="charPhoto" type="file" accept="image/*"></div>
+</div>
+<label>Name (40 characters maximum)</label>
+<input id="charName" maxlength="40" placeholder="Character name">
+<label>Gender</label>
+<select id="charGender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select>
+<label>Age</label><input id="charAge" placeholder="Age">
+<label>Height</label><input id="charHeight" placeholder="Height">
+<label>Appearance</label><textarea id="charAppearance"></textarea>
+<label>Personality</label><textarea id="charPersonality"></textarea>
+<label>Occupation</label><input id="charOccupation">
+<label>Relationship status</label><input id="charRelationship">
+<label>Likes / Dislikes</label><textarea id="charLikes"></textarea>
+<label>Secrets</label><textarea id="charSecrets"></textarea>
+<label>Character Description (7000 characters maximum)</label>
+<textarea id="charAbout" class="largeText" maxlength="7000"></textarea>
+<div id="charCount" class="counter">0/7000</div>
+<label>First message</label><textarea id="charGreeting"></textarea>
+<label>Visibility</label>
+<select id="charVisibility"><option value="public">Public</option><option value="private">Private</option><option value="unlisted">Unlisted</option></select>
+<button class="full" id="saveCharacter">Save Character</button>
+<button class="full ghost" onclick="newCharacter()">Clear</button>
+<div id="charStatus" class="muted"></div>
+</div>
 
-let isRegister = false;
-let editingId = null;
+<div class="card hidden" id="storyPanel">
+<h2>Create Story</h2>
+<label>Story title</label><input id="storyTitle">
+<label>Description</label><textarea id="storyDescription"></textarea>
+<label>World / Setting</label><textarea id="storyWorld"></textarea>
+<label>Main characters / NPCs</label><textarea id="storyCast"></textarea>
+<label>Your role</label><input id="storyRole">
+<label>Visibility</label>
+<select id="storyVisibility"><option value="public">Public</option><option value="private">Private</option><option value="unlisted">Unlisted</option></select>
+<button class="full" id="saveStory">Save Story</button>
+<div id="storyStatus" class="muted"></div>
+</div>
 
-</script>
+<div class="card hidden" id="profilePanel">
+<h2>My Profile</h2>
+<h3 id="profileName"></h3>
+<div class="muted" id="profileUid"></div>
+<button class="ghost" onclick="copyUid()">Copy UID</button>
+<h3>My Characters</h3><div id="myList"></div>
+<h3>My Stories</h3><div id="myStories"></div>
+<button class="full ghost" onclick="logout()">Log out</button>
+</div>
+
+<div class="card hidden" id="worldPanel">
+<h2>Character World</h2>
+<div id="worldFeatureContent"></div>
+</div>
+
+<div class="card hidden" id="storyDetailPanel">
+<div id="storyDetailContent"></div>
+</div>
+
+<div class="card hidden" id="roleplayPanel">
+<h2 id="roleplayTitle">Story Roleplay</h2>
+<div id="roleplayMessages" class="roleplayMessages"></div>
+<textarea id="roleplayInput" placeholder="Write your dialogue..."></textarea>
+<button class="full" id="sendRoleplay">Send</button>
+<div id="roleplayStatus" class="muted"></div>
+</div>
+</section>
+<nav class="nav hidden" id="nav">
+<button data-tab="home" onclick="showTab('home')">Home</button>
+<button data-tab="discover" onclick="showTab('discover')">Discover</button>
+<button data-tab="create" onclick="showTab('create')">Create</button>
+<button data-tab="profile" onclick="showTab('profile')">Profile</button>
+<button data-tab="world" onclick="showTab('world')">World</button>
+</nav>
+</main>
+</body>
+</html>
